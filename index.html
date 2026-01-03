@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradox AI - Multi Language</title>
+    <title>Paradox AI - Ultimate Fix</title>
     <!-- Icons & Fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -59,13 +59,13 @@
         
         .input-area { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-body); }
         .input-box { display: flex; align-items: flex-end; background: var(--bg-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
-        /* IMPROVED TEXTAREA FOR CODE PASTING */
+        
         textarea { 
             flex: 1; background: transparent; border: none; color: white; 
             resize: none; min-height: 24px; max-height: 300px; 
             font-size: 15px; font-family: inherit; line-height: 1.5; padding: 0 5px; 
         }
-        #send-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; margin-left: 10px; margin-bottom: 2px; }
+        #send-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; margin-left: 10px; margin-bottom: 2px; display:flex; align-items:center; justify-content:center;}
 
         /* OVERLAYS */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg-body); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -81,7 +81,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-overlay">
         <h1>Paradox AI</h1>
-        <p style="color: #888;">Multi-Language Edition</p>
+        <p style="color: #888;">Multi-Language & Code Fix</p>
         <button id="login-btn" style="background: white; color: black; padding: 12px 24px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer;">Sign in with Google</button>
         <button id="guest-btn" style="background: transparent; color: #888; border: none; margin-top: 20px; cursor: pointer; text-decoration: underline;">Use as Guest</button>
     </div>
@@ -119,13 +119,13 @@
 
         <div id="chat-container">
             <div class="message-row ai">
-                <div class="bubble">System Online. Aap Roman Urdu ya Hindi mein bhi baat kar sakte hain.</div>
+                <div class="bubble">System Online. Aap Roman Urdu, Hindi, ya English mein baat kar sakte hain.</div>
             </div>
         </div>
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="user-input" placeholder="Message... (Shift+Enter for new line)" rows="1"></textarea>
+                <textarea id="user-input" placeholder="Message..."></textarea>
                 <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -197,17 +197,20 @@
             if(loader) loader.remove();
         }
 
-        // --- ROBUST API CALL (WITH LANGUAGE PROMPT) ---
+        // --- ROBUST API CALL (URL Encoding Fix) ---
         async function fetchAI(userInput) {
             const seed = Math.floor(Math.random() * 1000000); 
             
             // SYSTEM PROMPT FOR LANGUAGES
             const systemPrompt = "You are Paradox. You are a helpful expert assistant. " + 
-                               "IMPORTANT: If the user speaks in Roman Urdu or Hindi, YOU MUST REPLY IN ROMAN URDU OR HINDI. " +
-                               "If they speak English, reply in English. " +
+                               "If the user speaks in Roman Urdu or Hindi, REPLY IN ROMAN URDU OR HINDI. " +
+                               "If English, reply in English. " +
                                "If asked for code, provide full working code in a code block.";
 
-            const finalPrompt = systemPrompt + "\n\nUser: " + userInput;
+            // We cut the input if it's massive to prevent URL error, but keep enough for context
+            const safeInput = userInput.length > 3000 ? userInput.substring(0, 3000) + "... [truncated]" : userInput;
+            
+            const finalPrompt = systemPrompt + "\n\nUser: " + safeInput;
 
             // 1. Try Default
             try {
@@ -216,7 +219,7 @@
                 if(res.ok) return await res.text();
             } catch(e) { console.log("Default model busy, trying backup..."); }
 
-            // 2. Try Backup
+            // 2. Try Backup (Mistral)
             try {
                 const url = `https://text.pollinations.ai/${encodeURIComponent(finalPrompt)}?model=mistral&seed=${seed}`;
                 const res = await fetch(url);
@@ -260,7 +263,7 @@
 
             } catch (error) {
                 removeLoading();
-                appendMessage("Error: Network is extremely busy. Please wait 10 seconds and try again.", 'ai');
+                appendMessage("Error: Network is extremely busy or message too long for free tier.", 'ai');
             } finally {
                 document.getElementById('send-btn').disabled = false;
             }
@@ -269,17 +272,18 @@
         // --- IMPROVED INPUT HANDLING ---
         const inputField = document.getElementById('user-input');
         
-        // Auto-Resize logic handles pasting large code blocks
+        // 1. Auto-Resize
         inputField.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // Handle Enter vs Shift+Enter
+        // 2. ENTER KEY FIX
         inputField.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+            // Check for Enter key (keyCode 13 or key 'Enter')
+            if ((e.key === 'Enter' || e.keyCode === 13) && !e.shiftKey) {
+                e.preventDefault(); // Stop new line
+                sendMessage();      // Trigger Send
             }
         });
 
