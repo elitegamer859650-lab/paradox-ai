@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradox AI - Auto Fix</title>
+    <title>Paradox AI - Fixed Input</title>
     <!-- Icons & Fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
-        /* CSS STYLES */
+        /* BASE STYLES */
         :root { --bg-body: #09090b; --bg-sidebar: #121214; --bg-input: #1e1e20; --border: #27272a; --primary: #3b82f6; --text-main: #f4f4f5; --text-muted: #a1a1aa; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
@@ -45,7 +45,7 @@
         .user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 2px; }
         .ai .bubble { background: #18181b; border: 1px solid var(--border); color: #e4e4e7; border-bottom-left-radius: 2px; width: 100%; max-width: 800px; }
         
-        /* LOADING ANIMATION */
+        /* LOADING */
         .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 15px 20px; background: #18181b; border: 1px solid var(--border); border-radius: 16px; border-bottom-left-radius: 2px; width: fit-content; }
         .dot { width: 8px; height: 8px; background: #666; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
         .dot:nth-child(1) { animation-delay: -0.32s; } .dot:nth-child(2) { animation-delay: -0.16s; }
@@ -58,9 +58,9 @@
         pre { margin: 0; padding: 15px; overflow-x: auto; }
         
         .input-area { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-body); }
-        .input-box { display: flex; background: var(--bg-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
-        textarea { flex: 1; background: transparent; border: none; color: white; resize: none; height: 24px; max-height: 200px; font-size: 15px; }
-        #send-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
+        .input-box { display: flex; align-items: flex-end; background: var(--bg-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
+        textarea { flex: 1; background: transparent; border: none; color: white; resize: none; height: 24px; max-height: 200px; font-size: 15px; font-family: inherit; line-height: 1.5; padding: 0 5px; }
+        #send-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; margin-left: 10px; margin-bottom: 2px; }
 
         /* OVERLAYS */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg-body); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -76,7 +76,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-overlay">
         <h1>Paradox AI</h1>
-        <p style="color: #888;">Robust Engine Version</p>
+        <p style="color: #888;">Chat Ready</p>
         <button id="login-btn" style="background: white; color: black; padding: 12px 24px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer;">Sign in with Google</button>
         <button id="guest-btn" style="background: transparent; color: #888; border: none; margin-top: 20px; cursor: pointer; text-decoration: underline;">Use as Guest</button>
     </div>
@@ -120,7 +120,7 @@
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="user-input" placeholder="Message..."></textarea>
+                <textarea id="user-input" placeholder="Message..." rows="1"></textarea>
                 <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -194,16 +194,14 @@
 
         // --- NEW ROBUST API CALL ---
         async function fetchAI(prompt) {
-            const seed = Math.floor(Math.random() * 1000000); // Random seed prevents caching
+            const seed = Math.floor(Math.random() * 1000000); 
             
-            // 1. Try Default (Best Model)
             try {
                 const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?seed=${seed}`;
                 const res = await fetch(url);
                 if(res.ok) return await res.text();
             } catch(e) { console.log("Default model busy, trying backup..."); }
 
-            // 2. Try Backup (Mistral)
             try {
                 const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=mistral&seed=${seed}`;
                 const res = await fetch(url);
@@ -218,8 +216,10 @@
             const text = input.value.trim();
             if(!text) return;
 
+            // UI Update
             appendMessage(text, 'user');
             input.value = '';
+            input.style.height = '24px'; // Reset height after send
             document.getElementById('send-btn').disabled = true;
             showLoading();
 
@@ -236,9 +236,7 @@
             }
 
             try {
-                // Use the new Robust Fetcher
                 const aiText = await fetchAI("You are Paradox, an expert coding assistant. " + text);
-                
                 removeLoading();
                 appendMessage(aiText, 'ai');
 
@@ -253,6 +251,25 @@
                 document.getElementById('send-btn').disabled = false;
             }
         }
+
+        // --- INPUT HANDLING FIX ---
+        const inputField = document.getElementById('user-input');
+        
+        // 1. Auto-Resize Input
+        inputField.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // 2. ENTER to Send, SHIFT+ENTER for New Line
+        inputField.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line
+                sendMessage();      // Trigger send
+            }
+        });
+
+        document.getElementById('send-btn').onclick = sendMessage;
 
         // --- HISTORY & HELPERS ---
         function loadHistory() {
@@ -313,8 +330,6 @@
             div.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
             document.getElementById('chat-container').scrollTop = 99999;
         }
-
-        document.getElementById('send-btn').onclick = sendMessage;
     </script>
 </body>
 </html>
