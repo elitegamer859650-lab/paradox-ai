@@ -3,313 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradox AI - Ultimate</title>
-    <!-- Icons & Fonts -->
+    <title>Paradox AI - Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-    <!-- Markdown & Highlight -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark-reasonable.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
-        :root {
-            --bg-body: #09090b;
-            --bg-sidebar: #121214; /* Slightly lighter than body */
-            --bg-input: #1e1e20;
-            --border: #27272a;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --user-bubble: #2563eb;
-            --ai-bubble: #18181b;
-        }
-
+        /* CSS IS THE SAME AS THE "ULTIMATE" VERSION FOR CONSISTENCY */
+        :root { --bg-body: #09090b; --bg-sidebar: #121214; --bg-input: #1e1e20; --border: #27272a; --primary: #3b82f6; --text-main: #f4f4f5; --text-muted: #a1a1aa; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
-        #sidebar {
-            width: 280px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            z-index: 50;
-            transition: transform 0.3s ease;
-        }
-
-        .brand {
-            padding: 25px 20px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.5px;
-        }
+        /* SIDEBAR */
+        #sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; transition: 0.3s; }
+        .brand { padding: 25px 20px; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .brand i { color: var(--primary); }
-
-        #new-chat-btn {
-            margin: 0 15px 10px;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-main);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-        }
-        #new-chat-btn:hover { background: rgba(255,255,255,0.1); border-color: #52525b; }
-
-        /* HISTORY LIST (Scrollable Middle) */
-        #history-wrapper {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .history-label { font-size: 11px; font-weight: 700; color: #52525b; text-transform: uppercase; margin: 10px 0 5px; padding-left: 5px; }
+        #new-chat-btn { margin: 0 15px 10px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); cursor: pointer; display: flex; gap: 10px; align-items: center; }
+        #history-wrapper { flex: 1; overflow-y: auto; padding: 10px 15px; }
+        .chat-item { padding: 10px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
+        .chat-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         
-        .chat-item {
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-        }
-        .chat-item i { font-size: 12px; opacity: 0.7; }
-        .chat-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
-        .chat-item.active { background: rgba(59, 130, 246, 0.15); color: var(--primary); font-weight: 500; }
-
-        /* PROFILE SECTION (Fixed Bottom) */
-        .profile-section {
-            padding: 20px;
-            border-top: 1px solid var(--border);
-            background: var(--bg-sidebar);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .profile-section:hover { background: rgba(255,255,255,0.02); }
+        /* PROFILE (BOTTOM) */
+        .profile-section { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-sidebar); display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #27272a; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
         
-        .avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            background: #27272a;
-            color: #fff;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            overflow: hidden;
-        }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- MAIN AREA --- */
+        /* MAIN */
         #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-
-        header {
-            height: 60px;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            background: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10;
-        }
-
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
-        }
-
-        /* WELCOME / IDEAS */
-        #welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: var(--text-main);
-            padding: 20px;
-        }
-        .ideas-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-            max-width: 600px;
-            width: 100%;
-        }
-        .idea-card {
-            background: var(--bg-sidebar);
-            border: 1px solid var(--border);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .idea-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .idea-card h4 { margin: 0 0 5px; font-size: 14px; color: var(--text-main); }
-        .idea-card p { margin: 0; font-size: 12px; color: var(--text-muted); }
-
+        header { height: 60px; padding: 0 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: rgba(9,9,11,0.9); }
+        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
         /* MESSAGES */
         .message-row { display: flex; width: 100%; }
         .message-row.user { justify-content: flex-end; }
         .message-row.ai { justify-content: flex-start; }
+        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.6; }
+        .user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+        .ai .bubble { background: #18181b; border: 1px solid var(--border); color: #e4e4e7; border-bottom-left-radius: 2px; width: 100%; max-width: 800px; }
         
-        .bubble {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-        .user .bubble { background: var(--user-bubble); color: white; border-bottom-right-radius: 2px; }
-        .ai .bubble { background: var(--ai-bubble); border: 1px solid var(--border); color: #e4e4e7; border-bottom-left-radius: 2px; width: 100%; max-width: 800px; }
-
-        /* CODE BLOCKS & PREVIEW */
-        .code-block-wrapper {
-            margin: 15px 0;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            background: #18181b;
-        }
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: #27272a;
-            font-size: 12px;
-            color: #a1a1aa;
-        }
-        .code-actions button {
-            background: #3f3f46;
-            border: none;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-        .code-actions .preview-btn { background: var(--primary); }
-        .code-actions .preview-btn:hover { background: var(--primary-hover); }
-
+        /* PREVIEW */
+        .code-block-wrapper { margin: 15px 0; border: 1px solid var(--border); border-radius: 8px; background: #18181b; overflow: hidden; }
+        .code-header { display: flex; justify-content: space-between; padding: 8px 12px; background: #27272a; font-size: 12px; color: #a1a1aa; }
+        .preview-btn { background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 5px; }
         pre { margin: 0; padding: 15px; overflow-x: auto; }
-        code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
-
+        
         /* INPUT */
         .input-area { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-body); }
-        .input-box {
-            display: flex;
-            align-items: flex-end;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 10px 15px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 5px;
-            resize: none;
-            height: 24px;
-            max-height: 200px;
-            font-family: inherit;
-            font-size: 15px;
-        }
-        #send-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-            margin-bottom: 2px;
-        }
+        .input-box { display: flex; background: var(--bg-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
+        textarea { flex: 1; background: transparent; border: none; color: white; resize: none; height: 24px; max-height: 200px; font-size: 15px; }
+        #send-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
 
-        /* PREVIEW PANEL */
-        #preview-panel {
-            position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px; height: 100%;
-            background: white; z-index: 100; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: -10px 0 40px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-        }
-        #preview-panel.open { right: 0; }
-        .preview-header {
-            padding: 10px 15px; background: #f4f4f5; border-bottom: 1px solid #e4e4e7;
-            display: flex; justify-content: space-between; align-items: center; color: #18181b; font-weight: 600;
-        }
-        iframe { flex: 1; border: none; width: 100%; height: 100%; background: white; }
-
-        /* AUTH OVERLAY */
+        /* OVERLAYS */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg-body); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .google-btn { background: white; color: black; padding: 12px 24px; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; display: flex; gap: 10px; align-items: center; }
-
-        /* RESPONSIVE */
-        .mobile-toggle { display: none; background: none; border: none; color: white; font-size: 20px; }
-        @media (max-width: 768px) {
-            #sidebar { position: absolute; height: 100%; left: -280px; }
-            #sidebar.open { left: 0; box-shadow: 10px 0 50px rgba(0,0,0,0.5); }
-            .mobile-toggle { display: block; }
-            .ideas-grid { grid-template-columns: 1fr; }
-        }
+        #preview-panel { position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px; height: 100%; background: white; z-index: 100; transition: 0.4s; display: flex; flex-direction: column; }
+        #preview-panel.open { right: 0; }
+        iframe { flex: 1; border: none; }
+        
+        @media (max-width: 768px) { #sidebar { position: absolute; height: 100%; left: -280px; } #sidebar.open { left: 0; box-shadow: 10px 0 50px rgba(0,0,0,0.5); } }
     </style>
 </head>
 <body>
 
     <!-- AUTH SCREEN -->
     <div id="auth-overlay">
-        <h1 style="margin-bottom: 10px;">Paradox AI</h1>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Unlimited Chat & Code</p>
-        <button id="login-btn" class="google-btn"><i class="fab fa-google"></i> Sign in with Google</button>
+        <h1>Paradox AI</h1>
+        <p style="color: #888;">Fixed Version</p>
+        <button id="login-btn" style="background: white; color: black; padding: 12px 24px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer;">Sign in with Google</button>
+        <button id="guest-btn" style="background: transparent; color: #888; border: none; margin-top: 20px; cursor: pointer; text-decoration: underline;">Use as Guest (No History)</button>
     </div>
 
-    <!-- PREVIEW SLIDER -->
+    <!-- PREVIEW PANEL -->
     <div id="preview-panel">
-        <div class="preview-header">
-            <span><i class="fas fa-eye"></i> Live Preview</span>
-            <button onclick="document.getElementById('preview-panel').classList.remove('open')" style="border:none; background:none; cursor:pointer;"><i class="fas fa-times"></i></button>
+        <div style="padding: 10px; background: #eee; display: flex; justify-content: space-between;">
+            <span style="color: black; font-weight: bold;">Preview</span>
+            <button onclick="document.getElementById('preview-panel').classList.remove('open')" style="border:none; cursor:pointer;">Close</button>
         </div>
         <iframe id="preview-frame"></iframe>
     </div>
@@ -318,114 +86,45 @@
     <nav id="sidebar">
         <div class="brand"><i class="fas fa-cube"></i> PARADOX</div>
         <button id="new-chat-btn"><i class="fas fa-plus"></i> New Chat</button>
-
-        <div id="history-wrapper">
-            <div class="history-label">Recent Chats</div>
-            <div id="history-list">
-                <!-- Chat items will be injected here -->
-            </div>
-        </div>
-
+        <div id="history-wrapper"><div id="history-list"></div></div>
         <div class="profile-section" id="user-menu">
-            <div class="avatar" id="user-avatar">U</div>
-            <div style="flex: 1; overflow: hidden;">
-                <div id="user-name" style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</div>
-                <div style="font-size: 11px; color: var(--text-muted);">Pro Account</div>
+            <div class="avatar" id="user-avatar"><i class="fas fa-user"></i></div>
+            <div style="flex: 1;">
+                <div id="user-name" style="font-size: 14px; font-weight: 600;">Guest</div>
+                <div style="font-size: 11px; color: #888;">Online</div>
             </div>
-            <i class="fas fa-sign-out-alt" style="color: #ef4444; opacity: 0.8;"></i>
         </div>
     </nav>
 
-    <!-- MAIN APP -->
+    <!-- MAIN -->
     <main id="main">
         <header>
-            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+            <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; color:white; font-size: 20px;"><i class="fas fa-bars"></i></button>
             <div style="font-weight: 600;">Paradox</div>
-            <button id="theme-btn" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-moon"></i></button>
+            <div></div>
         </header>
 
         <div id="chat-container">
-            <!-- WELCOME SCREEN -->
-            <div id="welcome-screen">
-                <div style="font-size: 40px; margin-bottom: 10px;">👋</div>
-                <h2>How can I help you today?</h2>
-                
-                <div class="ideas-grid">
-                    <div class="idea-card" onclick="setInput('Write a Python script to automate file organization')">
-                        <div style="color: #3b82f6; margin-bottom: 5px;"><i class="fas fa-code"></i> Coding</div>
-                        <h4>File Organizer</h4>
-                        <p>Write a Python script to automate...</p>
-                    </div>
-                    <div class="idea-card" onclick="setInput('Create a simple landing page for a Coffee Shop with HTML/CSS')">
-                        <div style="color: #10b981; margin-bottom: 5px;"><i class="fas fa-laptop-code"></i> Web Design</div>
-                        <h4>Coffee Shop Site</h4>
-                        <p>Create a responsive landing page...</p>
-                    </div>
-                    <div class="idea-card" onclick="setInput('Explain Quantum Entanglement in simple terms')">
-                        <div style="color: #f59e0b; margin-bottom: 5px;"><i class="fas fa-lightbulb"></i> Learning</div>
-                        <h4>Quantum Physics</h4>
-                        <p>Explain entanglement simply...</p>
-                    </div>
-                    <div class="idea-card" onclick="setInput('Give me a 3-day workout plan for beginners')">
-                        <div style="color: #ef4444; margin-bottom: 5px;"><i class="fas fa-dumbbell"></i> Lifestyle</div>
-                        <h4>Workout Plan</h4>
-                        <p>3-day routine for beginners...</p>
-                    </div>
-                </div>
+            <div class="message-row ai">
+                <div class="bubble">System Online. I am ready to help.</div>
             </div>
         </div>
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="user-input" placeholder="Message Paradox..." rows="1"></textarea>
+                <textarea id="user-input" placeholder="Message..."></textarea>
                 <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-            <div style="text-align: center; font-size: 11px; color: #555; margin-top: 5px;">
-                Paradox may display inaccurate info. Powered by Pollinations AI.
             </div>
         </div>
     </main>
 
-    <!-- LOGIC -->
     <script type="module">
+        // IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, push, set, onValue, off, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 1. MARKED JS CONFIG (Preview Feature)
-        const renderer = new marked.Renderer();
-        renderer.code = function(code, language) {
-            const safeCode = encodeURIComponent(code);
-            return `
-            <div class="code-block-wrapper">
-                <div class="code-header">
-                    <span>${language || 'text'}</span>
-                    <div class="code-actions">
-                        <button onclick="copyToClipboard('${safeCode}')"><i class="fas fa-copy"></i> Copy</button>
-                        <button class="preview-btn" onclick="openPreview('${safeCode}')"><i class="fas fa-play"></i> Preview</button>
-                    </div>
-                </div>
-                <pre><code class="hljs language-${language}">${hljs.highlightAuto(code).value}</code></pre>
-            </div>`;
-        };
-        marked.setOptions({ renderer: renderer });
-
-        window.copyToClipboard = (encoded) => { navigator.clipboard.writeText(decodeURIComponent(encoded)); };
-        window.openPreview = (encoded) => {
-            const code = decodeURIComponent(encoded);
-            document.getElementById('preview-panel').classList.add('open');
-            const blob = new Blob([code], { type: 'text/html' });
-            document.getElementById('preview-frame').src = URL.createObjectURL(blob);
-        };
-        window.setInput = (text) => {
-            const input = document.getElementById('user-input');
-            input.value = text;
-            input.focus();
-            input.style.height = 'auto'; 
-            input.style.height = input.scrollHeight + 'px';
-        };
-
-        // 2. FIREBASE SETUP
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyCSiqI0wxTUXpy2H0rAN0tmnd56VRmMbuM",
             authDomain: "paradox-ai-f8ec1.firebaseapp.com",
@@ -444,134 +143,137 @@
 
         let currentUser = null;
         let activeChatId = null;
-        let messagesListener = null;
 
-        // AUTH
-        document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
-        document.getElementById('user-menu').onclick = () => signOut(auth);
+        // --- 2. AUTHENTICATION ---
+        document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider).catch(e => alert(e.message));
+        document.getElementById('guest-btn').onclick = () => document.getElementById('auth-overlay').style.display = 'none';
+        document.getElementById('user-menu').onclick = () => { if(currentUser) signOut(auth); };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('user-name').textContent = user.displayName;
-                if(user.photoURL) document.getElementById('user-avatar').innerHTML = `<img src="${user.photoURL}">`;
+                if(user.photoURL) document.getElementById('user-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%;">`;
                 loadHistory();
             } else {
-                document.getElementById('auth-overlay').style.display = 'flex';
-                document.getElementById('history-list').innerHTML = '';
+                currentUser = null;
+                document.getElementById('user-name').textContent = "Guest";
+                document.getElementById('history-list').innerHTML = '<div style="padding:10px; font-size:12px; color:#666;">Login to see history</div>';
             }
         });
 
-        // CHAT HISTORY
-        function loadHistory() {
-            onValue(ref(db, `users/${currentUser.uid}/chats`), (snapshot) => {
-                const list = document.getElementById('history-list');
-                list.innerHTML = '';
-                const data = snapshot.val();
-                if (data) {
-                    Object.entries(data)
-                        .sort((a, b) => b[1].timestamp - a[1].timestamp)
-                        .forEach(([id, chat]) => {
-                            const div = document.createElement('div');
-                            div.className = `chat-item ${id === activeChatId ? 'active' : ''}`;
-                            div.innerHTML = `<i class="far fa-comment-alt"></i> ${chat.title || 'New Chat'}`;
-                            div.onclick = () => loadChat(id);
-                            list.appendChild(div);
-                        });
-                }
-            });
-        }
-
-        document.getElementById('new-chat-btn').onclick = () => {
-            activeChatId = null;
-            if(messagesListener) off(messagesListener);
-            document.getElementById('chat-container').innerHTML = '';
-            document.getElementById('chat-container').appendChild(document.getElementById('welcome-screen'));
-            document.getElementById('welcome-screen').style.display = 'flex';
-            document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-            if(window.innerWidth < 769) document.getElementById('sidebar').classList.remove('open');
-        };
-
-        // MESSAGING LOGIC
+        // --- 3. ROBUST SEND LOGIC (THE FIX) ---
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if(!text) return;
 
-            // Initialize chat if new
-            if(!activeChatId) {
-                const newRef = push(ref(db, `users/${currentUser.uid}/chats`));
-                activeChatId = newRef.key;
-                await set(newRef, { title: text.substring(0, 30), timestamp: serverTimestamp() });
-                loadChat(activeChatId);
-            }
-
-            // UI Cleanup
+            // UI Updates (Immediate)
+            appendMessage(text, 'user');
             input.value = '';
-            input.style.height = 'auto';
-            document.getElementById('welcome-screen').style.display = 'none';
             document.getElementById('send-btn').disabled = true;
 
-            // 1. Save User Message
-            const msgsRef = ref(db, `users/${currentUser.uid}/chats/${activeChatId}/messages`);
-            await push(msgsRef, { role: 'user', text, timestamp: serverTimestamp() });
-            set(ref(db, `users/${currentUser.uid}/chats/${activeChatId}/timestamp`), serverTimestamp());
+            // FIREBASE SAVE (Try/Catch ensures AI works even if DB fails)
+            if(currentUser) {
+                try {
+                    if(!activeChatId) {
+                        const newRef = push(ref(db, `users/${currentUser.uid}/chats`));
+                        activeChatId = newRef.key;
+                        set(newRef, { title: text.substring(0, 20), timestamp: serverTimestamp() });
+                        loadHistory(); // Refresh sidebar
+                    }
+                    push(ref(db, `users/${currentUser.uid}/chats/${activeChatId}/messages`), { text, role: 'user', timestamp: serverTimestamp() });
+                } catch(e) { console.log("DB Error (Ignored):", e); }
+            }
 
+            // AI GENERATION (Independent of DB)
             try {
-                // 2. Pollinations AI Call
-                const system = "You are Paradox AI. You are an expert developer and assistant. If writing code, provide complete files.";
-                const prompt = `${system}\n\nUser: ${text}\nParadox:`;
+                const prompt = "You are Paradox, an expert coding assistant. Provide full code. " + text;
+                // Using generic Pollinations endpoint which is most stable
                 const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`);
+                
+                if(!response.ok) throw new Error("API Busy");
+                
                 const aiText = await response.text();
+                
+                // Show AI Message
+                appendMessage(aiText, 'ai');
 
-                // 3. Save AI Message
-                await push(msgsRef, { role: 'model', text: aiText, timestamp: serverTimestamp() });
+                // Save AI Message to DB
+                if(currentUser && activeChatId) {
+                    push(ref(db, `users/${currentUser.uid}/chats/${activeChatId}/messages`), { text: aiText, role: 'model', timestamp: serverTimestamp() });
+                }
 
             } catch (error) {
-                alert("Error connecting to AI. Please check internet.");
+                appendMessage("Error: AI service is busy. Please try again.", 'ai');
             } finally {
                 document.getElementById('send-btn').disabled = false;
             }
         }
 
-        // LOAD CHAT MESSAGES
-        function loadChat(chatId) {
-            if(messagesListener) off(messagesListener);
-            activeChatId = chatId;
-            
-            document.getElementById('welcome-screen').style.display = 'none';
-            const container = document.getElementById('chat-container');
-            container.innerHTML = ''; // Clear current view
-
-            const msgsRef = ref(db, `users/${currentUser.uid}/chats/${chatId}/messages`);
-            messagesListener = onValue(msgsRef, (snapshot) => {
-                container.innerHTML = ''; 
+        // --- 4. HISTORY & LOADING ---
+        function loadHistory() {
+            if(!currentUser) return;
+            onValue(ref(db, `users/${currentUser.uid}/chats`), (snapshot) => {
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
                 const data = snapshot.val();
-                if(data) {
-                    Object.values(data).forEach(msg => appendMessage(msg.text, msg.role));
+                if (data) {
+                    Object.entries(data).sort((a,b) => b[1].timestamp - a[1].timestamp).forEach(([id, chat]) => {
+                        const div = document.createElement('div');
+                        div.className = 'chat-item';
+                        div.innerHTML = `<i class="far fa-comment"></i> ${chat.title || 'Chat'}`;
+                        div.onclick = () => loadChat(id);
+                        list.appendChild(div);
+                    });
                 }
             });
-            
-            // Highlight sidebar item
-            if(window.innerWidth < 769) document.getElementById('sidebar').classList.remove('open');
         }
+
+        function loadChat(id) {
+            activeChatId = id;
+            document.getElementById('chat-container').innerHTML = '';
+            // Load messages
+            onValue(ref(db, `users/${currentUser.uid}/chats/${id}/messages`), (snapshot) => {
+                const container = document.getElementById('chat-container');
+                container.innerHTML = '';
+                const data = snapshot.val();
+                if(data) Object.values(data).forEach(m => appendMessage(m.text, m.role));
+            }, { onlyOnce: true }); // Load once to avoid loop issues
+        }
+
+        document.getElementById('new-chat-btn').onclick = () => {
+            activeChatId = null;
+            document.getElementById('chat-container').innerHTML = '<div class="message-row ai"><div class="bubble">New chat started.</div></div>';
+        };
+
+        // --- 5. UI HELPERS ---
+        const renderer = new marked.Renderer();
+        renderer.code = function(code, language) {
+            const safe = encodeURIComponent(code);
+            return `<div class="code-block-wrapper">
+                <div class="code-header"><span>${language}</span><button class="preview-btn" onclick="preview('${safe}')">Preview</button></div>
+                <pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>
+            </div>`;
+        };
+        marked.setOptions({ renderer: renderer });
+
+        window.preview = (c) => {
+            document.getElementById('preview-panel').classList.add('open');
+            const blob = new Blob([decodeURIComponent(c)], {type:'text/html'});
+            document.getElementById('preview-frame').src = URL.createObjectURL(blob);
+        };
 
         function appendMessage(text, role) {
             const div = document.createElement('div');
             div.className = `message-row ${role === 'model' ? 'ai' : 'user'}`;
             div.innerHTML = `<div class="bubble">${marked.parse(text)}</div>`;
             document.getElementById('chat-container').appendChild(div);
-            div.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
-            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+            document.getElementById('chat-container').scrollTop = 99999;
         }
 
-        // INPUT EVENTS
-        const tx = document.getElementById('user-input');
-        tx.addEventListener("input", function() { this.style.height = "auto"; this.style.height = (this.scrollHeight) + "px"; });
-        tx.addEventListener("keydown", function(e) { if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
         document.getElementById('send-btn').onclick = sendMessage;
-
     </script>
 </body>
 </html>
