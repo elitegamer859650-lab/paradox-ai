@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradox AI - Fixed Input</title>
+    <title>Paradox AI - Multi Language</title>
     <!-- Icons & Fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -59,7 +59,12 @@
         
         .input-area { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-body); }
         .input-box { display: flex; align-items: flex-end; background: var(--bg-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px; }
-        textarea { flex: 1; background: transparent; border: none; color: white; resize: none; height: 24px; max-height: 200px; font-size: 15px; font-family: inherit; line-height: 1.5; padding: 0 5px; }
+        /* IMPROVED TEXTAREA FOR CODE PASTING */
+        textarea { 
+            flex: 1; background: transparent; border: none; color: white; 
+            resize: none; min-height: 24px; max-height: 300px; 
+            font-size: 15px; font-family: inherit; line-height: 1.5; padding: 0 5px; 
+        }
         #send-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; margin-left: 10px; margin-bottom: 2px; }
 
         /* OVERLAYS */
@@ -76,7 +81,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-overlay">
         <h1>Paradox AI</h1>
-        <p style="color: #888;">Chat Ready</p>
+        <p style="color: #888;">Multi-Language Edition</p>
         <button id="login-btn" style="background: white; color: black; padding: 12px 24px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer;">Sign in with Google</button>
         <button id="guest-btn" style="background: transparent; color: #888; border: none; margin-top: 20px; cursor: pointer; text-decoration: underline;">Use as Guest</button>
     </div>
@@ -114,13 +119,13 @@
 
         <div id="chat-container">
             <div class="message-row ai">
-                <div class="bubble">System Online. How can I help?</div>
+                <div class="bubble">System Online. Aap Roman Urdu ya Hindi mein bhi baat kar sakte hain.</div>
             </div>
         </div>
 
         <div class="input-area">
             <div class="input-box">
-                <textarea id="user-input" placeholder="Message..." rows="1"></textarea>
+                <textarea id="user-input" placeholder="Message... (Shift+Enter for new line)" rows="1"></textarea>
                 <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -192,18 +197,28 @@
             if(loader) loader.remove();
         }
 
-        // --- NEW ROBUST API CALL ---
-        async function fetchAI(prompt) {
+        // --- ROBUST API CALL (WITH LANGUAGE PROMPT) ---
+        async function fetchAI(userInput) {
             const seed = Math.floor(Math.random() * 1000000); 
             
+            // SYSTEM PROMPT FOR LANGUAGES
+            const systemPrompt = "You are Paradox. You are a helpful expert assistant. " + 
+                               "IMPORTANT: If the user speaks in Roman Urdu or Hindi, YOU MUST REPLY IN ROMAN URDU OR HINDI. " +
+                               "If they speak English, reply in English. " +
+                               "If asked for code, provide full working code in a code block.";
+
+            const finalPrompt = systemPrompt + "\n\nUser: " + userInput;
+
+            // 1. Try Default
             try {
-                const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?seed=${seed}`;
+                const url = `https://text.pollinations.ai/${encodeURIComponent(finalPrompt)}?seed=${seed}`;
                 const res = await fetch(url);
                 if(res.ok) return await res.text();
             } catch(e) { console.log("Default model busy, trying backup..."); }
 
+            // 2. Try Backup
             try {
-                const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=mistral&seed=${seed}`;
+                const url = `https://text.pollinations.ai/${encodeURIComponent(finalPrompt)}?model=mistral&seed=${seed}`;
                 const res = await fetch(url);
                 if(res.ok) return await res.text();
             } catch(e) { console.log("Backup model busy..."); }
@@ -216,10 +231,9 @@
             const text = input.value.trim();
             if(!text) return;
 
-            // UI Update
             appendMessage(text, 'user');
             input.value = '';
-            input.style.height = '24px'; // Reset height after send
+            input.style.height = '24px'; // Reset height
             document.getElementById('send-btn').disabled = true;
             showLoading();
 
@@ -236,7 +250,7 @@
             }
 
             try {
-                const aiText = await fetchAI("You are Paradox, an expert coding assistant. " + text);
+                const aiText = await fetchAI(text);
                 removeLoading();
                 appendMessage(aiText, 'ai');
 
@@ -252,20 +266,20 @@
             }
         }
 
-        // --- INPUT HANDLING FIX ---
+        // --- IMPROVED INPUT HANDLING ---
         const inputField = document.getElementById('user-input');
         
-        // 1. Auto-Resize Input
+        // Auto-Resize logic handles pasting large code blocks
         inputField.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // 2. ENTER to Send, SHIFT+ENTER for New Line
+        // Handle Enter vs Shift+Enter
         inputField.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Prevent new line
-                sendMessage();      // Trigger send
+                e.preventDefault();
+                sendMessage();
             }
         });
 
@@ -303,7 +317,7 @@
 
         document.getElementById('new-chat-btn').onclick = () => {
             activeChatId = null;
-            document.getElementById('chat-container').innerHTML = '<div class="message-row ai"><div class="bubble">New chat started.</div></div>';
+            document.getElementById('chat-container').innerHTML = '<div class="message-row ai"><div class="bubble">System Online.</div></div>';
         };
 
         const renderer = new marked.Renderer();
